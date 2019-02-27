@@ -81,11 +81,17 @@ if __name__ == '__main__':
         #     'name': 'credit_default',
         #     'readable_name': 'Credit Default',
         # },
+        # {
+        #     'data': loader.StatlogVehicleData(verbose=verbose, seed=seed),
+        #     'name': 'statlog_vehicle_data',
+        #     'best_params': None,
+        #     'readable_name': 'Statlog Vehicle Data',
+        # },
         {
-            'data': loader.StatlogVehicleData(verbose=verbose, seed=seed),
-            'name': 'statlog_vehicle_data',
+            'data': loader.BankData(verbose=verbose, seed=seed),
+            'name': 'bank_data',
             'best_params': None,
-            'readable_name': 'Statlog Vehicle Data',
+            'readable_name': 'Bank Data',
         },
         # {
         #     'data': loader.WineData(verbose=verbose, seed=seed),
@@ -111,12 +117,12 @@ if __name__ == '__main__':
         #     'best_params': None,
         #     'readable_name': 'Madelon',
         # },
-        {
-            'data': loader.MadelonCulled(verbose=verbose, seed=seed),
-            'name': 'madelon_culled',
-            'best_params': None,
-            'readable_name': 'Madelon Culled',
-        }
+        # {
+        #     'data': loader.MadelonCulled(verbose=verbose, seed=seed),
+        #     'name': 'madelon_culled',
+        #     'best_params': None,
+        #     'readable_name': 'Madelon Culled',
+        # }
     ]
 
     experiment_details = []

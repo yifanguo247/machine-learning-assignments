@@ -55,12 +55,12 @@ def main(P, mate, mutate, layers, training_iterations, test_data_file, train_dat
 
 
 if __name__ == "__main__":
-    DS_NAME = 'Vehicle'
+    DS_NAME = 'BankData'
     TEST_DATA_FILE = 'data/{}_test.csv'.format(DS_NAME)
     TRAIN_DATA_FILE = 'data/{}_train.csv'.format(DS_NAME)
     VALIDATE_DATA_FILE = 'data/{}_validate.csv'.format(DS_NAME)
     # [([32, 32, 32, 1], 5001, TEST_CULLED, TRAIN_CULLED, VALIDATE_CULLED, 'Culled'), ([18, 18, 4], 5001, TEST_VEHICLE, TRAIN_VEHICLE, VALIDATE_VEHICLE, 'Vehicle')]
-    layers = [18, 18, 1]
+    layers = [17, 2, 1]
     training_iterations = 5001
     for p in [50]:
         for mate in [20, 10]:

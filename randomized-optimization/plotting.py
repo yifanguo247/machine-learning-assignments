@@ -18,24 +18,24 @@ import matplotlib.pyplot as plt
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-input_path = 'output/'
-output_path = 'output/images/'
+input_path = 'output_backup/'
+output_path = 'output_backup/images/'
 to_process = {
-    'FLIPFLOP': {
-        'path': 'FLIPFLOP',
-        'nn_curve': False,
-        'multiple_trials': True
-    },
-    'TSP': {
-        'path': 'TSP',
-        'nn_curve': False,
-        'multiple_trials': True
-    },
-    'CONTPEAKS': {
-        'path': 'CONTPEAKS',
-        'nn_curve': False,
-        'multiple_trials': True
-    },
+    # 'FLIPFLOP': {
+    #     'path': 'FLIPFLOP',
+    #     'nn_curve': False,
+    #     'multiple_trials': True
+    # },
+    # 'TSP': {
+    #     'path': 'TSP',
+    #     'nn_curve': False,
+    #     'multiple_trials': True
+    # },
+    # 'CONTPEAKS': {
+    #     'path': 'CONTPEAKS',
+    #     'nn_curve': False,
+    #     'multiple_trials': True
+    # },
     'NN': {
         'path': 'NN_OUTPUT',
         'nn_curve': True,
@@ -117,9 +117,10 @@ def plot_data(title, data, column_prefixes=None, validate_only=False, nn_curve=F
 def read_data_file(file, nn_curve=False):
     logger.info("    - Processing {}".format(file))
     df = pd.read_csv(file)
+    print("columns: {}".format(df.columns))
     if 'iterations' not in df.columns:
         df = df.rename(columns={'iteration': 'iterations'})
-
+    print("renamed columns: {}".format(df.columns))
     df = df.set_index('iterations')
     # Trim the nn graphs to the first 1k iterations, as after that the graphs flatten out
     if nn_curve:
@@ -217,20 +218,22 @@ def plot_ga_data(problem_name, ga_files, output_dir, nn_curve=False):
     if not os.path.exists('{}/{}'.format(output_dir, problem_name)):
         os.makedirs('{}/{}'.format(output_dir, problem_name))
 
+    print("keys: {}".format(ga_files.keys()))
     for pop in ga_files.keys():
         logger.info(" - pop = {}".format(pop))
         mate_count = len(ga_files[pop].keys())
         for i, mate in enumerate(ga_files[pop].keys()):
             logger.info("   - mate = {}".format(mate))
 
+            print("ga_files: {}".format(ga_files))
             main_df = {}
             for y in graph_ys:
                 main_df[y] = pd.DataFrame()
             for mutate in ga_files[pop][mate].keys():
                 # Read the files into different dataframes
+                print("pop: {}, mate: {}, mutate: {}".format(pop, mate, mutate))
                 dfs = read_data_files(ga_files[pop][mate][mutate], nn_curve=nn_curve)
                 step_df = process_step_df(dfs, graph_ys)
-
                 if nn_curve:
                     dfs = list(dfs.values())
                     if mate not in main_df:
@@ -238,6 +241,7 @@ def plot_ga_data(problem_name, ga_files, output_dir, nn_curve=False):
                     for df in dfs:
                         df.columns = ['{}_{}'.format(mutate, str(col)) for col in df.columns]
                     main_df[mate].extend(dfs)
+                    print("main_df[mate]: {}".format(main_df[mate]))
                 else:
                     for y in graph_ys:
                         df = step_df[y]
@@ -411,7 +415,7 @@ def plot_backprop_data(problem_name, backprop_files, output_dir, nn_curve=False)
                 format='png', dpi=150)
 
 
-def plot_best_curves(problem_name, files, output_dir, nn_curve=False):
+def plot_best_curves(problem_name, files, output_dir, DS_NAME, nn_curve=False):
     graph_ys = ['fitness', 'time', 'fevals'] if not nn_curve else []
     logger.info("Plotting best results for {}".format(problem_name))
 
@@ -420,7 +424,7 @@ def plot_best_curves(problem_name, files, output_dir, nn_curve=False):
     if not os.path.exists('{}/{}'.format(output_dir, problem_name)):
         os.makedirs('{}/{}'.format(output_dir, problem_name))
 
-    output_file_name_regex = re.compile('{}_([A-Za-z]+)(.*)_LOG\.csv'.format(problem_name))
+    output_file_name_regex = re.compile('{}_{}_([A-Za-z]+)(.*)_LOG\.csv'.format(problem_name, DS_NAME))
     prefixes = []
     for algo in files:
         file = files[algo][0]
@@ -470,9 +474,9 @@ def plot_best_curves(problem_name, files, output_dir, nn_curve=False):
         format='png', dpi=150)
 
 
-def read_and_plot_test_output(base_dir, output_dir, problem_name, multiple_trials=True, nn_curve=False):
+def read_and_plot_test_output(base_dir, output_dir, problem_name, DS_NAME, multiple_trials=True, nn_curve=False):
     logger.info("Reading {} data".format(problem_name))
-    output_file_name_regex = re.compile('{}_([A-Za-z]+)(.*)_LOG\.csv'.format(problem_name))
+    output_file_name_regex = re.compile('{}_{}_([A-Za-z]+)(.*)_LOG\.csv'.format(problem_name, DS_NAME))
     output_files = glob.glob('{}/{}_*_LOG.csv'.format(base_dir, problem_name))
     files = defaultdict(dict)
     for output_file in output_files:
@@ -562,8 +566,8 @@ def read_and_plot_test_output(base_dir, output_dir, problem_name, multiple_trial
         plot_rhc_data(problem_name, files['RHC'], output_dir, nn_curve=nn_curve)
 
 
-def find_best_results(base_dir, problem_name, nn_curve=False, multiple_trials=False):
-    output_file_name_regex = re.compile('{}_([A-Za-z]+)(.*)_LOG\.csv'.format(problem_name))
+def find_best_results(base_dir, problem_name, DS_NAME, nn_curve=False, multiple_trials=False):
+    output_file_name_regex = re.compile('{}_{}_([A-Za-z]+)(.*)_LOG\.csv'.format(problem_name, DS_NAME))
     output_files = glob.glob('{}/{}_*_LOG.csv'.format(base_dir, problem_name))
     files = {}
     for output_file in output_files:
@@ -589,7 +593,7 @@ def find_best_results(base_dir, problem_name, nn_curve=False, multiple_trials=Fa
                 params = '_'.join(params[0:-1])
                 similar_files = glob.glob('{}/{}_{}{}*_LOG.csv'.format(base_dir, problem_name, algo, params))
 
-                # TODO: This is super inefficient ... but... maybe fine? ¯\_(ツ)_/¯
+                # TODO: This is super inefficient ... but... maybe fine?
                 # Double-check it's still the best
                 fitness_data = df['fitness']
                 for i, f in enumerate(list(similar_files)):
@@ -613,13 +617,14 @@ if __name__ == '__main__':
     for problem_name in to_process:
         logger.info("Processing {}".format(problem_name))
         problem = to_process[problem_name]
+        DS_NAME='BankData'
         read_and_plot_test_output('{}/{}'.format(input_path, problem['path']),
-                                  output_path, problem_name, nn_curve=problem['nn_curve'],
+                                  output_path, problem_name, DS_NAME, nn_curve=problem['nn_curve'],
                                   multiple_trials=problem['multiple_trials'])
-        best_files = find_best_results('{}/{}'.format(input_path, problem['path']), problem_name,
+        best_files = find_best_results('{}/{}'.format(input_path, problem['path']), problem_name, DS_NAME,
                                        nn_curve=problem['nn_curve'], multiple_trials=problem['multiple_trials'])
         the_best[problem_name] = best_files
-        plot_best_curves(problem_name, best_files, output_path, nn_curve=problem['nn_curve'])
+        plot_best_curves(problem_name, best_files, output_path, DS_NAME, nn_curve=problem['nn_curve'])
 
     # TODO: This is wrong, right? Doesn't take into account the averaging of values?
     with open(input_path + '/best_results.csv', 'w+') as f:

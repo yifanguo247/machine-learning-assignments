@@ -140,6 +140,10 @@ def train(oa, network, oaName, training_ints, validation_ints, testing_ints, mea
     """
     # print "\nError results for %s\n---------------------------" % (oaName,)
     times = [0]
+    header = '{},{},{},{},{},{},{},{},{},{},{}\n'.format('iteration', 'MSE_trg', 'MSE_val', 'MSE_tst', 'acc_trg', 'acc_val',
+                                                              'acc_tst', 'f1_trg', 'f1_val', 'f1_tst', 'elapsed')
+    print("writing columns to file: {}".format(outfile))
+    write_to_file(outfile, header)
     for iteration in xrange(training_iterations):
         start = time.clock()
         oa.train()

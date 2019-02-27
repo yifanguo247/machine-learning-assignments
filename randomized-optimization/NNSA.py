@@ -53,11 +53,11 @@ def main(CE, layers, training_iterations, test_data_file, train_data_file, valid
 
 
 if __name__ == "__main__":
-    DS_NAME = 'Culled'
+    DS_NAME = 'BankData'
     TEST_DATA_FILE = 'data/{}_test.csv'.format(DS_NAME)
     TRAIN_DATA_FILE = 'data/{}_train.csv'.format(DS_NAME)
     VALIDATE_DATA_FILE = 'data/{}_validate.csv'.format(DS_NAME)
-    layers = [250, 250, 1]
+    layers = [17, 2, 1]
     training_iterations = 5001
     for CE in [0.15, 0.35, 0.55, 0.70, 0.95]:
         main(CE, layers, training_iterations, TEST_DATA_FILE,
